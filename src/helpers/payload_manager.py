@@ -3,6 +3,10 @@ from Utilities.configurations import getConfig
 import json
 import os
 
+config = getConfig()
+file_path_customer = os.path.join(os.path.dirname(__file__), "../..", "customer_data.json")
+file_path_order = os.path.join(os.path.dirname(__file__), "../..", "order_data.json")
+
 
 def payload_create_customer():
     payload = {
@@ -16,9 +20,7 @@ def payload_create_customer():
 
 
 def payload_create_order():
-    file_path = os.path.join(os.path.dirname(__file__), "../..", "customer_data.json")
-
-    with open(file_path, "r") as file:
+    with open(file_path_customer, "r") as file:
         data = json.load(file)
         customer_id = data["customer_id"]
         mobile_number = data["mobile_number"]
@@ -44,9 +46,7 @@ def payload_create_order():
 
 
 def payload_txns_via_card():
-    file_path = os.path.join(os.path.dirname(__file__), "../..", "order_data.json")
-    config = getConfig()
-    with open(file_path, "r") as file:
+    with open(file_path_order, "r") as file:
         data = json.load(file)
         order_id = data["order_id"]
 
@@ -66,3 +66,22 @@ def payload_txns_via_card():
         "format": "json"
     }
     return payload
+
+
+def payload_UPI_Payment():
+    with open(file_path_order, "r") as file:
+        data = json.load(file)
+        order_id = data["order_id"]
+
+    payload = {
+        "order_id": order_id,
+        "merchant_id": config['API']['merchantID'],
+        "payment_method_type": "UPI",
+        "payment_method": "UPI",
+        "upi_vpa": config['CARD']['upi_vpa'],
+        "redirect_after_payment": "true",
+        "format": "json",
+        "txn_type":"UPI_COLLECT"
+    }
+    return payload
+
